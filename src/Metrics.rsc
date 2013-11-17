@@ -14,12 +14,10 @@ import util::Math;
 import lang::java::\syntax::Disambiguate;
 import lang::java::\syntax::Java15;
 
-import Complexity;
-
 import Extract::Parser;
-
-import Analyze::Volume;
 import Extract::Volume;
+import Analyze::Volume;
+import Analyze::Complexity;
 
 /* Predefined projects */
 public loc smallsql = |project://smallsql|;
@@ -45,6 +43,7 @@ public void analyzeJavaProject( loc project ) {
 	for ( loc method <- getAllMethods( parseTrees.tree ) ) {
 		println("Volume of method <method>: <getPhysicalLOC( method )>");
 		println("Man-months of method <method>: <getManMonths( method )>");
+		println("Complexity of method <method>: <getComplexity( method )>");
 	}
 	
 	for ( loc cls <- getClasses( parseTrees.tree ) ) {
