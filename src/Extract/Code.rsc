@@ -1,32 +1,37 @@
-module CodeSize
+module Extract::Code
 
 import IO;
 import List;
-import Map;
 import String;
 
 private bool inComment = false;
 private int lineIndex = -1;
 private list[str] lines;
 
-/* Retrieves the size of the given location. */
-public int getCodeSize( loc unit ) = countLinesOfCode( readFileLines( unit ) );
+/* Retrieves a list of strings containing the source lines of code. */
+public list[str] getSourceLines( loc unit ) = getLinesFromLocation( unit );
 
-/* Computes the LOC for the given list of string source code lines. */
-private int countLinesOfCode( list[str] source ) {
+/* Retrieves a list of strings containing the normalized source lines of code. */
+public list[str] getNormalizedSourceLines( loc unit ) = normalizeSource( getSourceLines( unit ) );
+
+/* Retrieves a list of lines from the given unit. */
+private list[str] getLinesFromLocation( loc unit ) = readFileLines( unit );
+
+/* Normalizes the list of lines to physical lines of code. */
+private list[str] normalizeSource( list[str] source ) {
 	lines = source;
 	lineIndex = -1;
-	count = 0;
+	list[str] result = [];
 	
 	while ( !isEOF() ) {
-		line = getNextLine();
+		str line = getNextLine();
 		
 		if ( isCode( line ) ) {
-			count += 1;
+			result += line;
 		}
 	}
 	
-	return count;
+	return result;
 }
 
 /* Retrieves the next line from internal cursor. */
@@ -36,16 +41,13 @@ private str getNextLine() {
 }
 
 /* Determines whether the end of the source has been reached. */
-private bool isEOF() = (lineIndex >= (size( lines ) - 1));
+private bool isEOF() = ( lineIndex >= ( size( lines ) - 1 ) );
 
 /* Determines whether the given string is actual code. */
 private bool isCode( str line ) = ( !isBlank( line ) && !isComment( line ) );
 
 /* Determines whether the given string is blank. */
-private bool isBlank( str line ) = (line == "");
-
-/* Determines whether the given string is a single bracket. */
-private bool isBracket( str line ) = (line == "}" || line == "{");
+private bool isBlank( str line ) = ( line == "" );
 
 /* Determines whether the given string is commented. */
 private bool isComment( str line ) {

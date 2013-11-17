@@ -1,16 +1,12 @@
-module Complexity
+module Analyze::Complexity
 
-import lang::java::m3::Core;
-import lang::java::m3::AST;
 import lang::java::\syntax::Java15;
-
-import IO;
 
 /* Retrieves the complexity for the given unit. */
 public int getComplexity( MethodDec method ) = computeComplexity( method );
 public int getComplexity( ConstrDec method ) = computeComplexity( method );
 
-/* Computes the McCabe complexity of given AST */
+/* Computes the McCabe complexity of given declaration */
 private int computeComplexity( value method ) {
 	/*
 	 McCabe formula:
