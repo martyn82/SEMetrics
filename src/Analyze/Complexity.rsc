@@ -1,13 +1,21 @@
 module Analyze::Complexity
 
-import lang::java::\syntax::Java15;
+import Exception;
+
+import lang::java::jdt::m3::Core;
+import lang::java::m3::AST;
 
 /* Retrieves the complexity for the given unit. */
-public int getComplexity( MethodDec method ) = computeComplexity( method );
-public int getComplexity( ConstrDec method ) = computeComplexity( method );
+public int getMethodComplexity( loc unit ) = computeComplexity( unit );
 
-/* Computes the McCabe complexity of given declaration */
-private int computeComplexity( value method ) {
+/* Computes the McCabe complexity of given method location. */
+private int computeComplexity( loc unit ) {
+	if ( !isMethod( unit ) ) {
+		throw IllegalArgument( "Given unit location must be a method: <unit>" );
+	}
+	
+	Declaration method = getMethodASTEclipse( unit );
+
 	/*
 	 McCabe formula:
 	 C = 2 + I + L + S - R
@@ -16,33 +24,33 @@ private int computeComplexity( value method ) {
 	 S := number of SWITCH CASE conditions
 	 R := number of RETURN statements (void methods have 0)
 	 The constant 2 ensures that C has an absolute minimum of 1.
-	 
-	 How about ternary statements? e.g.: x > 0 ? 12 : 9;
 	 */
 	count = 2;
 
 	visit ( method ) {
 		// IFs
-		case (Stm)`if (<Expr _>) <Stm _>`: count += 1;
-		case (Stm)`if (<Expr _>) <Stm _> else <Stm _>`: count += 1;
+		case \if(Expression _, Statement _): count += 1;
+		case \if(Expression _, Statement _, Statement _): count += 1;
+		case \conditional(Expression _, Expression _, Expression _): count += 1;
 		
 		// CATCHs
-		case (CatchClause)`catch (<FormalParam _>) <Block _>`: count += 1;
+		case \catch(Declaration _, Statement _): count += 1;
 		
 		// LOOPs
-		case (Stm)`for (<{Expr ","}* _>; <Expr? _>; <{Expr ","}* _>) <Stm _>`: count += 1;
-		case (Stm)`for (<LocalVarDec _>; <Expr? _>; <{Expr ","}* _>) <Stm _>`: count += 1;
-		case (Stm)`for (<FormalParam _> : <Expr _>) <Stm _>`: count += 1;
-		case (Stm)`while (<Expr _>) <Stm _>`: count += 1;
-		case (Stm)`do <Stm _> while (<Expr _>);`: count += 1;
-
+		case \for(list[Expression] _, Expression _, list[Expression] _, Statement _): count += 1;
+		case \for(list[Expression] _, list[Expression] _, Statement _): count += 1;
+		case \foreach(Declaration _, Expression _, Statement _): count += 1;
+		case \while(Expression _, Statement _): count += 1;
+		case \do(Statement _, Expression _): count += 1;
+		
 		// CASEs
-		case (Stm)`switch (<Expr _>) <SwitchBlock _>`: count += 1;
-		case (SwitchLabel)`case <Expr _>:`: count += 1;
+		case \swtich(Expression _, list[Statement] _): count += 1;
+		case \case(Expression _): count += 1;
 		
 		// RETURNs
-		case (Stm)`return <Expr? _>;`: count -= 1;
+		case \return(): count -= 1;
+		case \return(Expression _): count -= 1;
 	};
 
-	return count > 0 ? count : 1;
+	return count < 1 ? 1 : count;
 }
