@@ -22,7 +22,7 @@ import Extract::Volume;
 public loc smallsql = |project://smallsql|;
 public loc sample = |project://Sample|;
 
-public void analyzeJavaProject( loc project ) {
+public void analyzeProject( loc project ) {
 	M3 model = getModel( project );
 	set[loc] files = getProjectFiles( model );
 	set[loc] classes = getClasses( model );
@@ -33,7 +33,7 @@ public void analyzeJavaProject( loc project ) {
 	
 	for ( loc f <- files ) {
 		println( "Volume of <f>: <getPhysicalLOC( f )>" );
-		println( "Man-monts of <f>: <getManMonths( f )>" );
+		println( "Man-months of <f>: <getManMonths( f )>" );
 	}
 	
 	for ( loc c <- classes ) {
@@ -108,14 +108,16 @@ public map[str, tuple[rel[loc, int], int, int]] complexityPartitions( loc projec
 }
 
 /* Retrieves the amount of code cloned. */
-//public tuple[int, int] duplicatedCode( loc project ) {
-//	rel[list[str] lines, int numLines, int numClones] duplications = duplication( project );
-//	int clonedLines = 0;
-//	int totalSize = totalVolume( project );
-//	
-//	for ( duplication <- duplications ) {
-//		clonedLines += duplication.numLines * duplication.numClones;
-//	}
-//	
-//	return <clonedLines, ( ( clonedLines * 100 ) / totalSize )>;
-//}
+public tuple[int absLines, int relLines] duplicatedCode( loc project ) {
+	M3 model = getModel( project );
+	set[loc] files = getProjectFiles( model );
+	int totalSize = getTotalPhysicalLOC( files );
+	rel[loc method, list[str] lines, int numLines, int numClones] duplications = getClones( model );
+	int clonedLines = 0;
+	
+	for ( duplication <- duplications ) {
+		clonedLines += duplication.numLines * duplication.numClones;
+	}
+	
+	return <clonedLines, ( ( clonedLines * 100 ) / totalSize )>;
+}

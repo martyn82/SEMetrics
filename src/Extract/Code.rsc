@@ -14,8 +14,30 @@ public list[str] getSourceLines( loc unit ) = getLinesFromLocation( unit );
 /* Retrieves a list of strings containing the normalized source lines of code. */
 public list[str] getNormalizedSourceLines( loc unit ) = normalizeSource( getSourceLines( unit ) );
 
+/* Retrieves a list of tuples as the numbered lines of source code for given location. */
+public lrel[int, str] getSourceLinesNumbered( loc unit ) {
+	int lineNum = 1;
+	list[str] lines = getLinesFromLocation( unit );
+	lrel[int, str] result = [];
+	
+	for ( str line <- lines ) {
+		result += [<lineNum, line>];
+		lineNum += 1;
+	}
+	
+	return result;
+}
+
+/* Retrieves a list of tuples as the numbered and normalized lines of source code for given location. */
+public lrel[int, str] getNormalizedSourceLinesNumbered( loc unit ) =
+	normalizeNumberedSource( getSourceLinesNumbered( unit ) );
+
 /* Retrieves a list of lines from the given unit. */
 private list[str] getLinesFromLocation( loc unit ) = readFileLines( unit );
+
+/* Retrieves a list of normalized numbered lines of source code. */
+private lrel[int, str] normalizeNumberedSource( list[tuple[int, str]] source ) =
+	[<n, trim( l )> | <n, l> <- source, isCode( trim( l ) )];
 
 /* Normalizes the list of lines to physical lines of code. */
 private list[str] normalizeSource( list[str] source ) {
@@ -26,9 +48,11 @@ private list[str] normalizeSource( list[str] source ) {
 	while ( !isEOF() ) {
 		str line = getNextLine();
 		
-		if ( isCode( line ) ) {
-			result += line;
+		if ( !isCode( line ) ) {
+			continue;
 		}
+		
+		result += line;
 	}
 	
 	return result;
@@ -50,11 +74,8 @@ private bool isCode( str line ) = ( !isBlank( line ) && !isComment( line ) );
 private bool isBlank( str line ) = ( line == "" );
 
 /* Determines whether the given string is commented. */
+private bool isComment( "" ) = inComment;
 private bool isComment( str line ) {
-	if ( line == "" ) {
-		return inComment;
-	}
-	
 	if ( inComment && /\*\/$/ := line ) {
 		// within a comment block, line ending occurance of "*/" is comment end.
 		inComment = false;
