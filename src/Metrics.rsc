@@ -1,123 +1,161 @@
 module Metrics
 
 import IO;
-
-import List;
-import Relation;
-import Set;
-import String;
+import util::Math;
 
 import lang::java::m3::Core;
-
-import util::FileSystem;
-import util::Math;
 
 import Analyze::Clones;
 import Analyze::Complexity;
 import Analyze::Volume;
 import Extract::Parser;
 import Extract::Volume;
+import Synthesize::Clones;
+import Synthesize::Complexity;
 
 /* Predefined projects */
 public loc smallsql = |project://smallsql|;
 public loc sample = |project://Sample|;
 
+/*
+Ranks:
+	-2: --
+	-1: -
+	 0: o
+	+1: +
+	+2: ++
+*/
+private int plus2 = 2;
+private int plus = 1;
+private int neutral = 0;
+private int minus = -1;
+private int minus2 = -2;
+
 public void analyzeProject( loc project ) {
 	M3 model = getModel( project );
-	set[loc] files = getProjectFiles( model );
-	set[loc] classes = getClasses( model );
-	set[loc] methods = getMethods( model );
 	
-	println( "<size(files)> files in project" );
-	println( "Volume of project <project>: <getTotalPhysicalLOC( files )>" );
-	
-	for ( loc f <- files ) {
-		println( "Volume of <f>: <getPhysicalLOC( f )>" );
-		println( "Man-months of <f>: <getManMonths( f )>" );
-	}
-	
-	for ( loc c <- classes ) {
-		println( "Volume of <c>: <getPhysicalLOC( c )>" );
-		println( "Man-months of <c>: <getManMonths( c )>" );
-	}
-	
-	for ( loc m <- methods ) {
-		println( "Volume of <m>: <getPhysicalLOC( m )>" );
-		println( "Man-months of <m>: <getManMonths( m )>" );
-		println( "Complexity of <m>: <getMethodComplexity( m )>" );
-	}
+	println( "Analyzability: <getAnalyzabilityRank( model )>" );
+	println( "Changeability: <getChangeabilityRank( model )>" );
+	println( "Stability: <getStabilityRank( model )>" );
+	println( "Testability: <getTestabilityRank( model )>" );
 }
 
-/*
-	Partitions the given project into risk areas.
-	Returns a mapping from string specifying the risk category to
-	a triple consisting of:
-	1: A relation of unit locations to their cyclomatic complexity,
-	2: The absolute number of LOC,
-	3: The relative number of LOC
-*/
-public map[str, tuple[rel[loc, int], int, int]] complexityPartitions( loc project ) {
-	M3 model = getModel( project );
-	set[loc] methods = getMethods( model );
-	rel[loc location, int complexity] complexities = {};
+/* Computes the complexity ranking */
+public int getComplexityRank( M3 model ) {
+	map[int category, tuple[rel[loc unit, int complexity] c, int absLOC, real relLOC] t] partitions =
+		getComplexityPartitions( model );
 	
-	for ( loc method <- methods ) {
-		complexities += {<method, getMethodComplexity( method )>};
+	real midLOC = partitions[2].relLOC;
+	real highLOC = partitions[3].relLOC;
+	real vHighLOC = partitions[4].relLOC;
+	
+	if ( midLOC <= 25 && highLOC == 0 && vHighLOC == 0 ) {
+		return plus2;
 	}
 	
-	int lowSize = 0;
-	int midSize = 0;
-	int highSize = 0;
-	int vHighSize = 0;
-	
-	rel[loc, int] lows = {};
-	rel[loc, int] mids = {};
-	rel[loc, int] highs = {};
-	rel[loc, int] vhighs = {};
-
-	for ( comp <- complexities ) {
-		if ( comp.complexity < 11 ) {
-			lowSize += getPhysicalLOC( comp.location );
-			lows += {comp};
-		}
-		
-		if ( comp.complexity > 10 && comp.complexity < 21 ) {
-			midSize += getPhysicalLOC( comp.location );
-			mids += {comp};
-		}
-		
-		if ( comp.complexity > 20 && comp.complexity < 51 ) {
-			highSize += getPhysicalLOC( comp.location );
-			highs += {comp};
-		}
-
-		if ( comp.complexity > 50 ) {
-			vHighSize += getPhysicalLOC( comp.location );
-			vhighs += {comp};
-		}
+	if ( midLOC <= 30 && highLOC < 6 && vHighLOC == 0 ) {
+		return plus;
 	}
 	
-	int totalSize = lowSize + midSize + highSize + vHighSize;
+	if ( midLOC <= 40 && highLOC <= 10 && vHighLOC == 0 ) {
+		return neutral;
+	}
 	
-	return (
-		"low risk" : <lows, lowSize, ( ( lowSize * 100 ) / totalSize )>,
-		"moderate risk" : <mids, midSize, ( ( midSize * 100 ) / totalSize )>,
-		"high risk" : <highs, highSize, ( ( highSize * 100 ) / totalSize )>,
-		"very high risk" : <vhighs, vHighSize, ( ( vHighSize * 100 ) / totalSize )>
-	);
+	if ( midLOC <= 50 && highLOC <= 15 && vHighLOC <= 5 ) {
+		return minus;
+	}
+	
+	return minus2;
 }
 
-/* Retrieves the amount of code cloned. */
-public tuple[int absLines, int relLines] duplicatedCode( loc project ) {
-	M3 model = getModel( project );
+/* Computes the rank of volume. */
+public int getVolumeRank( M3 model ) {
 	set[loc] files = getProjectFiles( model );
-	int totalSize = getTotalPhysicalLOC( files );
-	rel[loc method, list[str] lines, int numLines, int numClones] duplications = getClones( model );
-	int clonedLines = 0;
+	real manMonths = getManMonths( files );
+	int manYears = ceil( manMonths * 12 );
 	
-	for ( duplication <- duplications ) {
-		clonedLines += duplication.numLines * duplication.numClones;
+	if ( manYears >= 160 ) {
+		return minus2;
 	}
 	
-	return <clonedLines, ( ( clonedLines * 100 ) / totalSize )>;
+	if ( manYears >= 80 && manYears < 160 ) {
+		return minus;
+	}
+	
+	if ( manYears >= 30 && manYears < 80 ) {
+		return neutral;
+	}
+	
+	if ( manYears >= 8 && manYears < 30 ) {
+		return plus;
+	}
+	
+	return plus2;
+}
+
+/* Computes the rank for duplicated code. */
+public int getDuplicationRank( M3 model ) {
+	tuple[int absLOC, real relLOC] duplicated = getDuplicationLOCCounts( model );
+	
+	if ( duplicated.relLOC < 3 ) {
+		return plus2;
+	}
+	
+	if ( duplicated.relLOC >= 3 && duplicated.relLOC < 5 ) {
+		return plus;
+	}
+	
+	if ( duplicated.relLOC >= 5 && duplicated.relLOC < 10 ) {
+		return neutral;
+	}
+	
+	if ( duplicated.relLOC >= 10 && duplicated.relLOC < 20 ) {
+		return minus;
+	}
+	
+	return minus2;
+}
+
+/* Computes the rank for unit size. */
+public int getUnitSizeRank( M3 model ) {
+	return neutral; // How to determine this one?
+}
+
+/* Computes rank for unit testing. */
+public int getUnitTestRank( M3 model ) {
+	return neutral;
+}
+
+/* Computes the rank for analyzability. */
+public int getAnalyzabilityRank( M3 model ) {
+	int volumeRank = getVolumeRank( model );
+	int duplicationRank = getDuplicationRank( model );
+	int unitSizeRank = getUnitSizeRank( model );
+	int unitTestRank = getUnitTestRank( model );
+	
+	return ( volumeRank + duplicationRank + unitSizeRank + unitTestRank );
+}
+
+/* Computes the rank for changeability. */
+public int getChangeabilityRank( M3 model ) {
+	int complexityRank = getComplexityRank( model );
+	int duplicationRank = getDuplicationRank( model );
+	
+	return ( complexityRank + duplicationRank );
+}
+
+/* Computes the rank for stability. */
+public int getStabilityRank( M3 model ) {
+	int unitTestRank = getUnitTestRank( model );
+	
+	return unitTestRank;
+}
+
+/* Computes the rank for testability. */
+public int getTestabilityRank( M3 model ) {
+	int complexityRank = getComplexityRank( model );
+	int unitSizeRank = getUnitSizeRank( model );
+	int unitTestRank = getUnitTestRank( model );
+	
+	return ( complexityRank + unitSizeRank + unitTestRank );
 }

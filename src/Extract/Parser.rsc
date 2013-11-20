@@ -1,9 +1,6 @@
 module Extract::Parser
 
-import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
-
-import util::FileSystem;
 
 /* Retrieves a M3 model from the given project. */
 public M3 getModel( loc project ) = createM3FromEclipseProject( project );

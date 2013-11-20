@@ -1,7 +1,5 @@
 module Analyze::Volume
 
-import util::Math;
-
 import Extract::Volume;
 
 /* The number of lines one developer adds each month. */
@@ -22,8 +20,8 @@ import Extract::Volume;
 */
 private real fpRatioJava = 687.0;
 
-/* Retrieves the number of man months for given unit. */
+/* Retrieves the number of man-months for given unit. */
 public real getManMonths( loc unit ) = ( getPhysicalLOC( unit ) / fpRatioJava );
 
-/* Retrieves the number of man-years for given units. */
-public real getManYears( set[loc] units ) = (0.0 | it + getManMonths( unit ) | unit <- units);
+/* Retrieves the number of man-months for given units. */
+public real getManMonths( set[loc] units ) = (0.0 | it + getManMonths( unit ) | unit <- units);
