@@ -40,7 +40,7 @@ private int duplicationRank = 0;
 private int unitTestRank = 0;
 
 /* Ranks given project on maintainability attributes. */
-public void scoreProject( loc project ) {
+public void analyzeProject( loc project ) {
 	M3 model = getModel( project );
 	
 	complexityRank = 0;
