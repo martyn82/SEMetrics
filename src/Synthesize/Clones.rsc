@@ -8,16 +8,13 @@ import Extract::Volume;
 
 /* Retrieves the duplicated LOC counts of the given model. */
 public tuple[int absLOC, real relLOC] getDuplicationLOCCounts( M3 model ) {
-	lrel[loc methodA, loc methodB, tuple[int, int] block, int numLines] duplications = getCodeClones( model );
+	tuple[map[loc file, set[int] lineNumbers] blockStart, int lineCount] duplications = getDuplications( model );
+	
 	set[loc] files = getProjectFiles( model );
 	int totalLOC = getTotalPhysicalLOC( files );
 	
-	int absLOC = 0;
+	int duplicatedLines = duplications.lineCount;
+	real relativeLineCount = ( duplicatedLines * 100.0 ) / totalLOC;
 	
-	for ( dup <- duplications ) {
-		absLOC += dup.numLines;
-	}
-	
-	real relLOC = ( absLOC * 100.0 ) / totalLOC;
-	return <absLOC, relLOC>;
+	return <duplicatedLines, relativeLineCount>;
 }

@@ -16,8 +16,8 @@ import Synthesize::Volume;
 
 /* Predefined projects */
 public loc sample = |project://Sample|;
-public loc smallsql = |project://smallsql|;
-public loc hsqldb = |project://hsqldb-2.3.1|;
+public loc smallsql = |project://smallsql/database|;
+public loc hsqldb = |project://hsqldb-2.3.1/src|;
 
 /*
 Ranks:
@@ -42,6 +42,12 @@ private int unitTestRank = 0;
 /* Ranks given project on maintainability attributes. */
 public void scoreProject( loc project ) {
 	M3 model = getModel( project );
+	
+	complexityRank = 0;
+	unitSizeRank = 0;
+	volumeRank = 0;
+	duplicationRank = 0;
+	unitTestRank = 0;
 	
 	println( "Analyzability: <rankToScore( getAnalyzabilityRank( model ) )>" );
 	println( "Changeability: <rankToScore( getChangeabilityRank( model ) )>" );
