@@ -3,7 +3,7 @@ module Synthesize::Clones
 import lang::java::m3::Core;
 
 import Analyze::Clones;
-import Extract::Parser;
+import Extract::Model;
 import Extract::Volume;
 
 /* Retrieves the duplicated LOC counts of the given model. */

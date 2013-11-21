@@ -7,7 +7,7 @@ import String;
 import lang::java::m3::Core;
 
 import Extract::Code;
-import Extract::Parser;
+import Extract::Model;
 
 /* The minimum chunk size for clone detection. */
 private int minChunkSize = 6;
@@ -15,7 +15,7 @@ private int minChunkSize = 6;
 /* Cached clones. */
 private lrel[loc methodA, loc methodB, tuple[int, int] block, int numLines] clones = [];
 
-/* Detects code clones in the given model. */
+/* Detects code clones in the given model and returns them. */
 public lrel[loc methodA, loc methodB, tuple[int, int] block, int numLines] getCodeClones( M3 model ) {
 	if ( size( clones ) > 0 ) {
 		return clones;

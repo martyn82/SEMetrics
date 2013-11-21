@@ -1,4 +1,4 @@
-module Extract::Parser
+module Extract::Model
 
 import lang::java::jdt::m3::Core;
 

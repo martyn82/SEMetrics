@@ -8,14 +8,15 @@ import lang::java::m3::Core;
 import Analyze::Clones;
 import Analyze::Complexity;
 import Analyze::Volume;
-import Extract::Parser;
+import Extract::Model;
 import Extract::Volume;
 import Synthesize::Clones;
 import Synthesize::Complexity;
 
 /* Predefined projects */
-public loc smallsql = |project://smallsql|;
 public loc sample = |project://Sample|;
+public loc smallsql = |project://smallsql|;
+public loc hsqldb = |project://hsqldb-2.3.1|;
 
 /*
 Ranks:
@@ -31,7 +32,8 @@ private int neutral = 0;
 private int minus = -1;
 private int minus2 = -2;
 
-public void analyzeProject( loc project ) {
+/* Ranks given project on maintainability attributes. */
+public void rankProject( loc project ) {
 	M3 model = getModel( project );
 	
 	println( "Analyzability: <getAnalyzabilityRank( model )>" );
@@ -45,9 +47,13 @@ public int getComplexityRank( M3 model ) {
 	map[int category, tuple[rel[loc unit, int complexity] c, int absLOC, real relLOC] t] partitions =
 		getComplexityPartitions( model );
 	
-	real midLOC = partitions[2].relLOC;
-	real highLOC = partitions[3].relLOC;
-	real vHighLOC = partitions[4].relLOC;
+	int midIndex = 2;
+	int highIndex = 3;
+	int vHighIndex = 4;
+	
+	real midLOC = partitions[midIndex].relLOC;
+	real highLOC = partitions[highIndex].relLOC;
+	real vHighLOC = partitions[vHighIndex].relLOC;
 	
 	if ( midLOC <= 25 && highLOC == 0 && vHighLOC == 0 ) {
 		return plus2;

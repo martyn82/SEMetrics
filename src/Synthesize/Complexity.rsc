@@ -3,7 +3,7 @@ module Synthesize::Complexity
 import lang::java::m3::Core;
 
 import Analyze::Complexity;
-import Extract::Parser;
+import Extract::Model;
 import Extract::Volume;
 
 /*
