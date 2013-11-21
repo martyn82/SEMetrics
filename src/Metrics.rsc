@@ -21,26 +21,37 @@ public loc hsqldb = |project://hsqldb-2.3.1|;
 
 /*
 Ranks:
-	-2: --
-	-1: -
-	 0: o
-	+1: +
-	+2: ++
+	1: --
+	2: -
+	3: o
+	4: +
+	5: ++
 */
-private int plus2 = 2;
-private int plus = 1;
-private int neutral = 0;
-private int minus = -1;
-private int minus2 = -2;
+private int plus2 = 5;
+private int plus = 4;
+private int neutral = 3;
+private int minus = 2;
+private int minus2 = 1;
 
 /* Ranks given project on maintainability attributes. */
-public void rankProject( loc project ) {
+public void scoreProject( loc project ) {
 	M3 model = getModel( project );
 	
-	println( "Analyzability: <getAnalyzabilityRank( model )>" );
-	println( "Changeability: <getChangeabilityRank( model )>" );
-	println( "Stability: <getStabilityRank( model )>" );
-	println( "Testability: <getTestabilityRank( model )>" );
+	println( "Analyzability: <rankToScore( getAnalyzabilityRank( model ) )>" );
+	println( "Changeability: <rankToScore( getChangeabilityRank( model ) )>" );
+	println( "Stability: <rankToScore( getStabilityRank( model ) )>" );
+	println( "Testability: <rankToScore( getTestabilityRank( model ) )>" );
+}
+
+/* Converts a ranking value to score. */
+private str rankToScore( int rank ) {
+	switch ( rank ) {
+		case 1: return "--";
+		case 2: return "-";
+		case 3: return "o";
+		case 4: return "+";
+		case 5: return "++";
+	}
 }
 
 /* Computes the complexity ranking */
@@ -167,7 +178,7 @@ public int getAnalyzabilityRank( M3 model ) {
 	int unitSizeRank = getUnitSizeRank( model );
 	int unitTestRank = getUnitTestRank( model );
 	
-	return ( volumeRank + duplicationRank + unitSizeRank + unitTestRank );
+	return ( volumeRank + duplicationRank + unitSizeRank + unitTestRank ) / 4;
 }
 
 /* Computes the rank for changeability. */
@@ -175,7 +186,7 @@ public int getChangeabilityRank( M3 model ) {
 	int complexityRank = getComplexityRank( model );
 	int duplicationRank = getDuplicationRank( model );
 	
-	return ( complexityRank + duplicationRank );
+	return ( complexityRank + duplicationRank ) / 2;
 }
 
 /* Computes the rank for stability. */
@@ -191,5 +202,5 @@ public int getTestabilityRank( M3 model ) {
 	int unitSizeRank = getUnitSizeRank( model );
 	int unitTestRank = getUnitTestRank( model );
 	
-	return ( complexityRank + unitSizeRank + unitTestRank );
+	return ( complexityRank + unitSizeRank + unitTestRank ) / 3;
 }
