@@ -7,7 +7,7 @@ import Extract::Model;
 import Extract::Volume;
 
 /*
-	Partitions the given project into risk areas.
+	Partitions the given model into risk areas (1 := low, 2 := moderate, 3 := high, 4 := very high).
 	Returns a mapping from string specifying the risk category to a triple consisting of:
 	1: A relation of unit locations to their cyclomatic complexity,
 	2: The absolute number of LOC,

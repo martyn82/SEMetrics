@@ -12,6 +12,7 @@ import Extract::Model;
 import Extract::Volume;
 import Synthesize::Clones;
 import Synthesize::Complexity;
+import Synthesize::Volume;
 
 /* Predefined projects */
 public loc sample = |project://Sample|;
@@ -124,7 +125,34 @@ public int getDuplicationRank( M3 model ) {
 
 /* Computes the rank for unit size. */
 public int getUnitSizeRank( M3 model ) {
-	return neutral; // How to determine this one?
+	map[int category, tuple[rel[loc unit, int size] s, int absLOC, real relLOC] t] partitions =
+		getVolumePartitions( model );
+	
+	int midIndex = 2;
+	int highIndex = 3;
+	int vHighIndex = 4;
+	
+	real midLOC = partitions[midIndex].relLOC;
+	real highLOC = partitions[highIndex].relLOC;
+	real vHighLOC = partitions[vHighIndex].relLOC;
+	
+	if ( midLOC <= 25 && highLOC == 0 && vHighLOC == 0 ) {
+		return plus2;
+	}
+	
+	if ( midLOC <= 30 && highLOC < 6 && vHighLOC == 0 ) {
+		return plus;
+	}
+	
+	if ( midLOC <= 40 && highLOC <= 10 && vHighLOC == 0 ) {
+		return neutral;
+	}
+	
+	if ( midLOC <= 50 && highLOC <= 15 && vHighLOC <= 5 ) {
+		return minus;
+	}
+	
+	return minus2;
 }
 
 /* Computes rank for unit testing. */

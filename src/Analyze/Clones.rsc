@@ -73,10 +73,7 @@ public lrel[loc methodA, loc methodB, tuple[int, int] block, int numLines] getCo
 					int cloneLength = cloneEndB - cloneStartB + 1; // Method declaration starts at 1
 
 					// Filter out the blocks that were previously recorded, but in different order.
-					if (
-						<entryA.method, cloneLength> notin duplicatedBlocks
-						&& <entryB.method, cloneLength> notin duplicatedBlocks
-					 ) {
+					if ( <entryA.method, cloneLength> notin duplicatedBlocks ) {
 						duplicatedBlocks += {<entryA.method, cloneLength>};
 						clones += [<entryA.method, entryB.method, <cloneStartB, cloneEndB>, cloneLength>];
 					}
