@@ -1,4 +1,4 @@
-module Model
+module Analyze::Model
 
 import lang::java::jdt::m3::Core;
 

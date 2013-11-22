@@ -4,10 +4,10 @@ import util::Math;
 
 import lang::java::m3::Core;
 
-import Code;
-import Complexity;
-import Model;
-import Volume;
+import Analyze::Code;
+import Analyze::Complexity;
+import Analyze::Model;
+import Analyze::Volume;
 
 /*
 Ranks:

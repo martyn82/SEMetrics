@@ -1,12 +1,12 @@
-module Complexity
+module Analyze::Complexity
 
 import Exception;
 
 import lang::java::jdt::m3::Core;
 import lang::java::m3::AST;
 
-import Model;
-import Volume;
+import Analyze::Model;
+import Analyze::Volume;
 
 /* Retrieves the complexity for the given unit. */
 public int getMethodComplexity( loc unit ) = computeComplexity( unit );

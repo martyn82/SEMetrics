@@ -1,4 +1,4 @@
-module Code
+module Analyze::Code
 
 import IO;
 import List;
@@ -8,8 +8,8 @@ import String;
 
 import lang::java::m3::Core;
 
-import Model;
-import Volume;
+import Analyze::Model;
+import Analyze::Volume;
 
 private bool inComment = false;
 private int lineIndex = -1;

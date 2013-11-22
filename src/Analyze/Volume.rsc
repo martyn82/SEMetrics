@@ -1,9 +1,9 @@
-module Volume
+module Analyze::Volume
 
 import List;
 
-import Code;
-import Model;
+import Analyze::Code;
+import Analyze::Model;
 
 import lang::java::m3::Core;
 

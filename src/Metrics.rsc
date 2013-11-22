@@ -5,7 +5,7 @@ import util::Math;
 
 import lang::java::m3::Core;
 
-import Model;
+import Analyze::Model;
 import Quality;
 
 /* Predefined projects */
