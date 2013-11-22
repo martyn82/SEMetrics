@@ -5,14 +5,10 @@ import util::Math;
 
 import lang::java::m3::Core;
 
-import Analyze::Clones;
-import Analyze::Complexity;
-import Analyze::Volume;
-import Extract::Model;
-import Extract::Volume;
-import Synthesize::Clones;
-import Synthesize::Complexity;
-import Synthesize::Volume;
+import Code;
+import Complexity;
+import Model;
+import Volume;
 
 /* Predefined projects */
 public loc sample = |project://Sample|;
@@ -113,7 +109,7 @@ public int getVolumeRank( M3 model ) {
 		return volumeRank;
 	}
 
-	set[loc] files = getProjectFiles( model );
+	set[loc] files = getFiles( model );
 	real manMonths = getManMonths( files );
 	int manYears = ceil( manMonths * 12 );
 	

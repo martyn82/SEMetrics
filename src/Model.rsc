@@ -1,4 +1,4 @@
-module Extract::Model
+module Model
 
 import lang::java::jdt::m3::Core;
 
@@ -6,7 +6,7 @@ import lang::java::jdt::m3::Core;
 public M3 getModel( loc project ) = createM3FromEclipseProject( project );
 
 /* Retrieves a set of file locations for the given model and file name extension. */
-public set[loc] getProjectFiles( M3 model ) = files( model );
+public set[loc] getFiles( M3 model ) = files( model );
 
 /* Retrieves a set of class locations from the given model. */
 public set[loc] getClasses( M3 model ) = classes( model );

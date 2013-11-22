@@ -1,8 +1,15 @@
-module Extract::Code
+module Code
 
 import IO;
 import List;
+import ListRelation;
+import Set;
 import String;
+
+import lang::java::m3::Core;
+
+import Model;
+import Volume;
 
 private bool inComment = false;
 private int lineIndex = -1;
@@ -18,14 +25,11 @@ public list[str] getNormalizedSourceLines( loc unit ) = normalizeSource( getSour
 public lrel[int, str] getSourceLinesNumbered( loc unit ) {
 	int lineNum = 1;
 	list[str] lines = getLinesFromLocation( unit );
-	lrel[int, str] result = [];
 	
-	for ( str line <- lines ) {
-		result += [<lineNum, line>];
+	return for ( str line <- lines ) {
+		append <lineNum, line>;
 		lineNum += 1;
-	}
-	
-	return result;
+	};
 }
 
 /* Retrieves a list of tuples as the numbered and normalized lines of source code for given location. */
@@ -104,4 +108,82 @@ private bool isComment( str line ) {
 	}
 
 	return inComment;
+}
+
+/* Returns the minimum clone size. */
+public int getMinimumCloneSize() = 6;
+
+/* Retrieves duplications as tuple with a map from file to starting lines, and total count duplicated lines. */
+public tuple[map[tuple[loc, int], int], int] getDuplications( M3 model ) {
+	int blockSize = getMinimumCloneSize();
+
+	set[loc] files = getFiles( model );
+	lrel[loc file, lrel[int lineNumber, list[str] block] blocks] codeBlocks = getFileBlocks( files, blockSize );
+	map[tuple[loc, int], int] duplicatedBlocks = ();
+	
+	int lastLine = 0;
+	loc lastFile = |unknown:///|;
+	int blockStart = 0;
+
+	set[list[str]] uniqueBlocks = {};
+	int duplicatedLines = 0;
+	
+	for ( fileCodeBlock <- codeBlocks ) {
+		for ( codeBlock <- fileCodeBlock.blocks ) {
+			int beforeUnion = size( uniqueBlocks );
+			uniqueBlocks += {codeBlock.block};
+			
+			if ( beforeUnion == size( uniqueBlocks ) ) {
+				if ( lastFile == fileCodeBlock.file && codeBlock.lineNumber == lastLine + 1 ) {
+					duplicatedBlocks[<lastFile, blockStart>] += 1;
+					duplicatedLines += 1;
+				}
+				else {
+					blockStart = codeBlock.lineNumber;
+					duplicatedLines += blockSize;
+					duplicatedBlocks += ( <fileCodeBlock.file, blockStart> : blockSize );
+				}
+				
+				lastFile = fileCodeBlock.file;
+				lastLine = codeBlock.lineNumber;
+			}
+		}
+	}
+	
+	return <duplicatedBlocks, duplicatedLines>;
+}
+
+/* Retrieves the blocks per file. */
+private lrel[loc, lrel[int, list[str]]] getFileBlocks( set[loc] files, int blockSize ) =
+	[<file, getCodeBlocks( file, blockSize)> | file <- files ];
+
+/* Retrieves code blocks for the given file. */
+private lrel[int lineNumber, list[str] block] getCodeBlocks( loc file, int blockSize ) {
+	lrel[int lineNumber, str line] fileSource = getSourceLinesNumbered( file );
+	
+	int limit = blockSize;
+	int offset = 0;
+	
+	return while ( size( fileSource ) >= ( offset + limit ) ) {
+		lrel[int lineNumber, str line] block = fileSource[offset..(offset + limit)];
+		list[str] blockLines = range( block );
+		int blockStart = head( domain( block ) );
+
+		append <blockStart, blockLines>;
+		offset += 1;
+	};
+}
+
+/* Retrieves the duplicated LOC counts of the given model. */
+public tuple[int absLOC, real relLOC] getDuplicationLOCCounts( M3 model ) {
+	tuple[map[tuple[loc file, int blockStart] k, int blockSize] m, int lineCount] duplications = 
+		getDuplications( model );
+	
+	set[loc] files = getFiles( model );
+	int totalLOC = getLinesOfCode( files );
+	
+	int duplicatedLines = duplications.lineCount;
+	real relativeLineCount = ( duplicatedLines * 100.0 ) / totalLOC;
+	
+	return <duplicatedLines, relativeLineCount>;
 }
