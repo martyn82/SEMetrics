@@ -1,4 +1,4 @@
-module Metrics
+module Main
 
 import IO;
 import util::Math;
