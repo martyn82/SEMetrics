@@ -44,6 +44,10 @@ public rel[loc, int] getUnitLinesOfCode( set[loc] units ) = ({} | it + {<f, getL
 private real getFPMonthRatio() = 687.0;
 private real getFPDayRatio() = getFPMonthRatio() / 30;
 
+/* Retrieves the number of man-years for given unit(s). */
+public real getManYears( loc unit ) = getManMonths( unit ) / 12;
+public real getManYears( set[loc] units ) = getManMonths( units ) / 12;
+
 /* Retrieves the number of man-months for given unit(s). */
 public real getManMonths( loc unit ) = ( getLinesOfCode( unit ) / getFPMonthRatio() );
 public real getManMonths( set[loc] units ) = ( 0.0 | it + getManMonths( unit ) | unit <- units );

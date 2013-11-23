@@ -5,6 +5,8 @@ import Exception;
 import lang::java::jdt::m3::Core;
 import lang::java::m3::AST;
 
+import debug::Profiler;
+
 import Analyze::Model;
 import Analyze::Volume;
 
@@ -16,6 +18,8 @@ private int computeComplexity( loc unit ) {
 	if ( !isMethod( unit ) ) {
 		throw IllegalArgument( "Given unit location must be a method: <unit>" );
 	}
+	
+	log( "Start complexity of <unit>..." );
 	
 	Declaration method = getMethodASTEclipse( unit );
 	int count = 1;
@@ -36,6 +40,7 @@ private int computeComplexity( loc unit ) {
 		case \case(Expression _): count += 1;
 	};
 
+	log( "<unit> has complexity of <count>" );
 	return count;
 }
 

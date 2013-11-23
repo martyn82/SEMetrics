@@ -17,36 +17,39 @@ import Data::Metrics;
 
 /* Predefined projects */
 public loc sample = |project://Sample|;
-public loc smallsql = |project://smallsql/database|;
-public loc hsqldb = |project://hsqldb-2.3.1/src|;
+public loc smallsql = |project://smallsql/src/smallsql/database|;
+public loc hsqldb = |project://hsqldb-2.3.1/hsqldb/src|;
 
 /* Analyzes the given project location. */
-public Metrics analyze( loc project ) {
+public Metrics getMetrics( loc project ) {
 	M3 model = getModel( project );
 	
 	Metrics m = metrics( project );
 	
-	m@complexity = analyzeComplexity( model );
-	m@volume  = analyzeVolume( model );
-	m@clones  = analyzeClones( model );
-	m@files   = analyzeFiles( model );
-	m@classes = analyzeClasses( model );
-	m@methods = analyzeMethods( model );
+	m@complexity  = analyzeComplexity( model );
+	m@volume      = analyzeVolume( model );
+	m@clones      = analyzeClones( model );
+	m@files       = analyzeFiles( model );
+	m@classes     = analyzeClasses( model );
+	m@methods     = analyzeMethods( model );
 	m@duplication = analyzeDuplication( model );
-	m@size    = analyzeSize( model );
+	m@size        = analyzeSize( model );
 
 	return m;
-	
-	//println( "Analyzability: <rankToScore( getAnalyzabilityRank( model ) )>" );
-	//println( "Changeability: <rankToScore( getChangeabilityRank( model ) )>" );
-	//println( "Stability: <rankToScore( getStabilityRank( model ) )>" );
-	//println( "Testability: <rankToScore( getTestabilityRank( model ) )>" );
+}
+
+public void analyze( Metrics m ) {
+	println( "Analyzability: <rankToScore( getAnalyzabilityRank( m ) )>" );
+	println( "Changeability: <rankToScore( getChangeabilityRank( m ) )>" );
+	println( "Stability: <rankToScore( getStabilityRank( m ) )>" );
+	println( "Testability: <rankToScore( getTestabilityRank( m ) )>" );
+	println( "General Maintainability: <rankToScore( getMaintainabilityRank( m ) )>" );
 }
 
 /* Analyzes size. */
-private tuple[int linesOfCode, int lines] analyzeSize( M3 model ) {
+private tuple[int linesOfCode, int lines, real manDays, real manMonths, real manYears] analyzeSize( M3 model ) {
 	files = getFiles( model );
-	return <getLinesOfCode( files ), getLineCount( files )>;
+	return <getLinesOfCode( files ), getLineCount( files ), getManDays( files ), getManMonths( files ), getManYears( files )>;
 }
 /* Analyzes duplication. */
 private tuple[int absoluteLOC, real relativeLOC, int cloneCount, int minimumCloneSize] analyzeDuplication( M3 model ) {

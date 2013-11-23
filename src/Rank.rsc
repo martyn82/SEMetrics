@@ -1,14 +1,6 @@
 module Rank
 
 import util::Math;
-
-import lang::java::m3::Core;
-
-import Analyze::Code;
-import Analyze::Complexity;
-import Analyze::Model;
-import Analyze::Volume;
-
 import Data::Metrics;
 
 /*
@@ -24,11 +16,6 @@ private int plus = 4;
 private int neutral = 3;
 private int minus = 2;
 private int minus2 = 1;
-
-private int unitSizeRank = 0;
-private int volumeRank = 0;
-private int duplicationRank = 0;
-private int unitTestRank = 0;
 
 /* Computes the complexity ranking */
 public int getComplexityRank( Metrics m ) {
@@ -70,114 +57,91 @@ public int getComplexityRank( Metrics m ) {
 }
 
 /* Computes the rank of volume. */
-public int getVolumeRank( M3 model ) {
-	if ( volumeRank > 0 ) {
-		return volumeRank;
-	}
-
-	set[loc] files = getFiles( model );
-	real manMonths = getManMonths( files );
-	int manYears = ceil( manMonths * 12 );
+public int getVolumeRank( Metrics m ) {
+	real manYears = ( m@size ).manYears;
 	
 	if ( manYears >= 160 ) {
-		volumeRank = minus2;
 		return minus2;
 	}
 	
 	if ( manYears >= 80 && manYears < 160 ) {
-		volumeRank = minus;
 		return minus;
 	}
 	
 	if ( manYears >= 30 && manYears < 80 ) {
-		volumeRank = neutral;
 		return neutral;
 	}
 	
 	if ( manYears >= 8 && manYears < 30 ) {
-		volumeRank = plus;
 		return plus;
 	}
 	
-	volumeRank = plus2;
 	return plus2;
 }
 
 /* Computes the rank for duplicated code. */
-public int getDuplicationRank( M3 model ) {
-	if ( duplicationRank > 0 ) {
-		return duplicationRank;
-	}
-	
-	tuple[int absLOC, real relLOC] duplicated = getDuplicationLOCCounts( model );
-	
-	if ( duplicated.relLOC < 3 ) {
-		duplicationRank = plus2;
+public int getDuplicationRank( Metrics m ) {
+	duplicated = m@duplication;
+
+	if ( duplicated.relativeLOC < 3 ) {
 		return plus2;
 	}
 	
-	if ( duplicated.relLOC >= 3 && duplicated.relLOC < 5 ) {
-		duplicationRank = plus;
+	if ( duplicated.relativeLOC >= 3 && duplicated.relativeLOC < 5 ) {
 		return plus;
 	}
 	
-	if ( duplicated.relLOC >= 5 && duplicated.relLOC < 10 ) {
-		duplicationRank = neutral;
+	if ( duplicated.relativeLOC >= 5 && duplicated.relativeLOC < 10 ) {
 		return neutral;
 	}
 	
-	if ( duplicated.relLOC >= 10 && duplicated.relLOC < 20 ) {
-		duplicationRank = minus;
+	if ( duplicated.relativeLOC >= 10 && duplicated.relativeLOC < 20 ) {
 		return minus;
 	}
 	
-	duplicationRank = minus2;
 	return minus2;
 }
 
 /* Computes the rank for unit size. */
-public int getUnitSizeRank( M3 model ) {
-	if ( unitSizeRank > 0 ) {
-		return unitSizeRank;
-	}
+public int getUnitSizeRank( Metrics m ) {
+	v = m@volume;
 	
-	map[int category, tuple[rel[loc unit, int size] s, int absLOC, real relLOC] t] partitions =
-		getVolumePartitions( model );
-	
-	int midIndex = 2;
-	int highIndex = 3;
-	int vHighIndex = 4;
-	
-	real midLOC = partitions[midIndex].relLOC;
-	real highLOC = partitions[highIndex].relLOC;
-	real vHighLOC = partitions[vHighIndex].relLOC;
-	
-	if ( midLOC <= 25 && highLOC == 0 && vHighLOC == 0 ) {
-		unitSizeRank = plus2;
+	if (
+		v.medium.relativeLOC <= 25
+		&& v.large.relativeLOC == 0
+		&& v.xlarge.relativeLOC == 0
+	) {
 		return plus2;
 	}
 	
-	if ( midLOC <= 30 && highLOC <= 5 && vHighLOC == 0 ) {
-		unitSizeRank = plus;
+	if (
+		v.medium.relativeLOC <= 30
+		&& v.large.relativeLOC <= 5
+		&& v.xlarge.relativeLOC == 0
+	) {
 		return plus;
 	}
 	
-	if ( midLOC <= 40 && highLOC <= 10 && vHighLOC == 0 ) {
-		unitSizeRank = neutral;
+	if (
+		v.medium.relativeLOC <= 40
+		&& v.large.relativeLOC <= 10
+		&& v.xlarge.relativeLOC == 0
+	) {
 		return neutral;
 	}
 	
-	if ( midLOC <= 50 && highLOC <= 15 && vHighLOC <= 5 ) {
-		unitSizeRank = minus;
+	if (
+		v.medium.relativeLOC <= 50
+		&& v.large.relativeLOC <= 15
+		&& v.xlarge.relativeLOC <= 5
+	) {
 		return minus;
 	}
 	
-	unitSizeRank = minus2;
 	return minus2;
 }
 
 /* Computes rank for unit testing. */
-public int getUnitTestRank( M3 model ) {
-	unitTestRank = neutral;
+public int getUnitTestRank( Metrics m ) {
 	return neutral;
 }

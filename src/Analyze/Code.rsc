@@ -8,6 +8,8 @@ import String;
 
 import lang::java::m3::Core;
 
+import debug::Profiler;
+
 import Analyze::Model;
 import Analyze::Volume;
 
@@ -117,9 +119,13 @@ public int getMinimumCloneSize() = 6;
 public tuple[map[tuple[loc method, int cloneStart] location, int cloneSize] clone, int linesCloned] getDuplications(
 	M3 model
 ) {
+	log( "Start clone detection..." );
 	int blockSize = getMinimumCloneSize();
 
+	log( "Getting files..." );
 	set[loc] files = getFiles( model );
+	
+	log( "Getting code blocks..." );
 	lrel[loc file, lrel[int lineNumber, list[str] block] blocks] codeBlocks = getFileBlocks( files, blockSize );
 	map[tuple[loc, int], int] duplicatedBlocks = ();
 	
@@ -129,6 +135,8 @@ public tuple[map[tuple[loc method, int cloneStart] location, int cloneSize] clon
 
 	set[list[str]] uniqueBlocks = {};
 	int duplicatedLines = 0;
+	
+	log( "Searching for clones..." );
 	
 	for ( fileCodeBlock <- codeBlocks ) {
 		for ( codeBlock <- fileCodeBlock.blocks ) {
@@ -152,6 +160,8 @@ public tuple[map[tuple[loc method, int cloneStart] location, int cloneSize] clon
 		}
 	}
 	
+	log( "Clone detection done." );
+	
 	return <duplicatedBlocks, duplicatedLines>;
 }
 
@@ -161,7 +171,7 @@ private lrel[loc, lrel[int, list[str]]] getFileBlocks( set[loc] files, int block
 
 /* Retrieves code blocks for the given file. */
 private lrel[int lineNumber, list[str] block] getCodeBlocks( loc file, int blockSize ) {
-	lrel[int lineNumber, str line] fileSource = getSourceLinesNumbered( file );
+	lrel[int lineNumber, str line] fileSource = getNormalizedSourceLinesNumbered( file );
 	
 	int limit = blockSize;
 	int offset = 0;
@@ -182,7 +192,7 @@ public tuple[int absLOC, real relLOC] getDuplicationLOCCounts( M3 model ) {
 		getDuplications( model );
 	
 	set[loc] files = getFiles( model );
-	int totalLOC = getLinesOfCode( files );
+	int totalLOC = getLineCount( files );
 	
 	int duplicatedLines = duplications.lineCount;
 	real relativeLineCount = ( duplicatedLines * 100.0 ) / totalLOC;
