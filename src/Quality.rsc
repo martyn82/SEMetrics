@@ -1,6 +1,6 @@
 module Quality
 
-import Data::Metrics;
+import adt::Metrics;
 import Rank;
 
 /* Computes the rank for maintainability in general. */

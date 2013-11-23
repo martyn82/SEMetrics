@@ -1,4 +1,4 @@
-module Data::Metrics
+module adt::Metrics
 
 data Metrics = metrics( loc id );
 

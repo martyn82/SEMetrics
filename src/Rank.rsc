@@ -1,7 +1,7 @@
 module Rank
 
 import util::Math;
-import Data::Metrics;
+import adt::Metrics;
 
 /*
 Ranks:

@@ -10,12 +10,12 @@ import debug::Profiler;
 
 import Quality;
 
-import Analyze::Code;
-import Analyze::Complexity;
-import Analyze::Model;
-import Analyze::Volume;
+import analyze::Code;
+import analyze::Complexity;
+import analyze::Model;
+import analyze::Volume;
 
-import Data::Metrics;
+import adt::Metrics;
 
 /* Predefined projects */
 public loc sample = |project://Sample|;
@@ -71,8 +71,15 @@ public void analyze( Metrics m ) {
 /* Analyzes size. */
 private tuple[int linesOfCode, int lines, real manDays, real manMonths, real manYears] analyzeEffort( M3 model ) {
 	files = getFiles( model );
-	return <getLinesOfCode( files ), getLineCount( files ), getManDays( files ), getManMonths( files ), getManYears( files )>;
+	return <
+		getLinesOfCode( files ),
+		getLineCount( files ),
+		getManDays( files ),
+		getManMonths( files ),
+		getManYears( files )
+	>;
 }
+
 /* Analyzes duplication. */
 private tuple[int absoluteLOC, real relativeLOC, int cloneCount, int minimumCloneSize] analyzeDuplication( M3 model ) {
 	duplications = getDuplicationLOCCounts( model );

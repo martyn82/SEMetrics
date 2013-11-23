@@ -1,4 +1,4 @@
-module Analyze::Code
+module analyze::Code
 
 import IO;
 import List;
@@ -10,8 +10,8 @@ import lang::java::m3::Core;
 
 import debug::Profiler;
 
-import Analyze::Model;
-import Analyze::Volume;
+import analyze::Model;
+import analyze::Volume;
 
 private bool inComment = false;
 private int lineIndex = -1;
@@ -115,6 +115,7 @@ private bool isComment( str line ) {
 /* Returns the minimum clone size. */
 public int getMinimumCloneSize() = 6;
 
+/* Caching of duplications. */
 private bool hasDupes = false;
 private tuple[map[tuple[loc method, int cloneStart] location, int cloneSize] clone, int linesCloned] dupes;
 

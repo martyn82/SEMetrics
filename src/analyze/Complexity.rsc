@@ -1,4 +1,4 @@
-module Analyze::Complexity
+module analyze::Complexity
 
 import Exception;
 
@@ -7,8 +7,8 @@ import lang::java::m3::AST;
 
 import debug::Profiler;
 
-import Analyze::Model;
-import Analyze::Volume;
+import analyze::Model;
+import analyze::Volume;
 
 private map[loc, int] complexities = ();
 
