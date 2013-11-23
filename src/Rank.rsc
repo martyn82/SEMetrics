@@ -9,6 +9,8 @@ import Analyze::Complexity;
 import Analyze::Model;
 import Analyze::Volume;
 
+import Data::Metrics;
+
 /*
 Ranks:
 	1: --
@@ -23,50 +25,47 @@ private int neutral = 3;
 private int minus = 2;
 private int minus2 = 1;
 
-private int complexityRank = 0;
 private int unitSizeRank = 0;
 private int volumeRank = 0;
 private int duplicationRank = 0;
 private int unitTestRank = 0;
 
 /* Computes the complexity ranking */
-public int getComplexityRank( M3 model ) {
-	if ( complexityRank > 0 ) {
-		return complexityRank;
-	}
-
-	map[int category, tuple[rel[loc unit, int complexity] c, int absLOC, real relLOC] t] partitions =
-		getComplexityPartitions( model );
+public int getComplexityRank( Metrics m ) {
+	c = m@complexity;
 	
-	int midIndex = 2;
-	int highIndex = 3;
-	int vHighIndex = 4;
-	
-	real midLOC = partitions[midIndex].relLOC;
-	real highLOC = partitions[highIndex].relLOC;
-	real vHighLOC = partitions[vHighIndex].relLOC;
-	
-	if ( midLOC <= 25 && highLOC == 0 && vHighLOC == 0 ) {
-		complexityRank = plus2;
+	if (
+		c.moderate.relativeLOC <= 25
+		&& c.high.relativeLOC == 0
+		&& c.veryHigh.relativeLOC == 0
+	) {
 		return plus2;
 	}
 	
-	if ( midLOC <= 30 && highLOC <= 5 && vHighLOC == 0 ) {
-		complexityRank = plus;
+	if (
+		c.moderate.relativeLOC <= 30
+		&& c.high.relativeLOC <= 5
+		&& c.veryHigh.relativeLOC == 0
+	) {
 		return plus;
 	}
 	
-	if ( midLOC <= 40 && highLOC <= 10 && vHighLOC == 0 ) {
-		complexityRank = neutral;
+	if (
+		c.moderate.relativeLOC <= 40
+		&& c.high.relativeLOC <= 10
+		&& c.veryHigh.relativeLOC == 0
+	) {
 		return neutral;
 	}
 	
-	if ( midLOC <= 50 && highLOC <= 15 && vHighLOC <= 5 ) {
-		complexityRank = minus;
+	if (
+		c.moderate.relativeLOC <= 50
+		&& c.high.relativeLOC <= 15
+		&& c.veryHigh.relativeLOC <= 5
+	) {
 		return minus;
 	}
 	
-	complexityRank = minus2;
 	return minus2;
 }
 

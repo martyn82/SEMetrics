@@ -13,3 +13,6 @@ public set[loc] getClasses( M3 model ) = classes( model );
 
 /* Retrieves a set of method and constructor locations from the model. */
 public set[loc] getMethods( M3 model ) = methods( model );
+
+/* Retrieves a set of interface locations from the model. */
+public set[loc] getInterfaces( M3 model ) = interfaces( model );

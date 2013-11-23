@@ -36,7 +36,7 @@ private int computeComplexity( loc unit ) {
 		case \case(Expression _): count += 1;
 	};
 
-	return count < 1 ? 1 : count;
+	return count;
 }
 
 /*
@@ -49,12 +49,8 @@ private int computeComplexity( loc unit ) {
 public map[int category, tuple[rel[loc unit, int complexity] c, int absLOC, real relLOC] t] getComplexityPartitions(
 	M3 model
 ) {
-	set[loc] methods = getMethods( model );
-	rel[loc location, int complexity] complexities = {};
-	
-	for ( loc method <- methods ) {
-		complexities += {<method, getMethodComplexity( method )>};
-	}
+	rel[loc location, int complexity] complexities = {<method, getMethodComplexity( method )>
+		| method <- getMethods( model )};
 	
 	int lowSize = 0;
 	int midSize = 0;

@@ -41,13 +41,16 @@ public rel[loc, int] getUnitLinesOfCode( set[loc] units ) = ({} | it + {<f, getL
 	A project that was recently highly refactored where many complex module code was reduced to far less LOC of more
 	simple code. Then the man-months might differ a lot from the actual time that was spent on the program.
 */
-private real getFPRatioJava() = 687.0;
+private real getFPMonthRatio() = 687.0;
+private real getFPDayRatio() = getFPMonthRatio() / 30;
 
-/* Retrieves the number of man-months for given unit. */
-public real getManMonths( loc unit ) = ( getLinesOfCode( unit ) / getFPRatioJava() );
-
-/* Retrieves the number of man-months for given units. */
+/* Retrieves the number of man-months for given unit(s). */
+public real getManMonths( loc unit ) = ( getLinesOfCode( unit ) / getFPMonthRatio() );
 public real getManMonths( set[loc] units ) = ( 0.0 | it + getManMonths( unit ) | unit <- units );
+
+/* Retrieves the number of man-days for given unit(s). */
+public real getManDays( loc unit ) = ( getLinesOfCode( unit ) / getFPDayRatio() );
+public real getManDays( set[loc] units ) = ( 0.0 | it + getManDays( unit ) | unit <- units );
 
 /*
 	Partitions the given model into volume areas.
