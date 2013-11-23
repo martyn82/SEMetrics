@@ -41,15 +41,6 @@ public Metrics getMetrics( loc project ) {
 	log( "Analyze clones..." );
 	m@clones = analyzeClones( model );
 	
-	log( "Analyze files..." );
-	m@files = analyzeFiles( model );
-	
-	log( "Analyze classes..." );
-	m@classes = analyzeClasses( model );
-	
-	log( "Analyze methods..." );
-	m@methods = analyzeMethods( model );
-	
 	log( "Analyze duplications..." );
 	m@duplication = analyzeDuplication( model );
 	

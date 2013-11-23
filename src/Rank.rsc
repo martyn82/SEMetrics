@@ -11,11 +11,11 @@ Ranks:
 	4: +
 	5: ++
 */
-private int plus2 = 5;
-private int plus = 4;
-private int neutral = 3;
-private int minus = 2;
 private int minus2 = 1;
+private int minus = 2;
+private int neutral = 3;
+private int plus = 4;
+private int plus2 = 5;
 
 /* Computes the complexity ranking */
 public int getComplexityRank( Metrics m ) {
@@ -58,7 +58,7 @@ public int getComplexityRank( Metrics m ) {
 
 /* Computes the rank of volume. */
 public int getVolumeRank( Metrics m ) {
-	real manYears = ( m@size ).manYears;
+	real manYears = ( m@effort ).manYears;
 	
 	if ( manYears >= 160 ) {
 		return minus2;
