@@ -3,7 +3,7 @@ module debug::Profiler
 import DateTime;
 import IO;
 
-private bool isEnabled = false;
+private bool isEnabled = true;
 
 public void enable( bool v ) {
 	isEnabled = v;

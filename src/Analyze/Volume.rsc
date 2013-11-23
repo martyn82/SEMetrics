@@ -64,13 +64,13 @@ public real getManDays( set[loc] units ) = ( 0.0 | it + getManDays( unit ) | uni
 	2: The absolute number of LOC,
 	3: The relative number of LOC
 */
-public map[int category, tuple[rel[loc unit, int size] s, int absLOC, real relLOC] t] getVolumePartitions( M3 model ) {
-	set[loc] methods = getMethods( model );
-	rel[loc method, int size] sizes = {};
-	
-	for ( loc method <- methods ) {
-		sizes += {<method, getLinesOfCode( method )>};
-	}
+public tuple[
+	tuple[rel[loc method, int size] methods, int absoluteLOC, real relativeLOC] small,
+	tuple[rel[loc method, int size] methods, int absoluteLOC, real relativeLOC] medium,
+	tuple[rel[loc method, int size] methods, int absoluteLOC, real relativeLOC] large,
+	tuple[rel[loc method, int size] methods, int absoluteLOC, real relativeLOC] xlarge
+] getVolumePartitions( M3 model ) {
+	rel[loc method, int size] sizes = {<method, getLinesOfCode( method )> | method <- getMethods( model )};
 	
 	int smallSize = 0;
 	int midSize = 0;
@@ -106,10 +106,10 @@ public map[int category, tuple[rel[loc unit, int size] s, int absLOC, real relLO
 	
 	int totalVolume = ( smallSize + midSize + largeSize + vLargeSize );
 	
-	return (
-		1 : <smalls, smallSize, ( ( smallSize * 100.0 ) / totalVolume )>,
-		2 : <mids, midSize, ( ( midSize * 100.0 ) / totalVolume )>,
-		3 : <larges, largeSize, ( ( largeSize * 100.0 ) / totalVolume )>,
-		4 : <vLarges, vLargeSize, ( ( vLargeSize * 100.0 ) / totalVolume )>
-	);
+	return <
+		<smalls, smallSize, ( ( smallSize * 100.0 ) / totalVolume )>,
+		<mids, midSize, ( ( midSize * 100.0 ) / totalVolume )>,
+		<larges, largeSize, ( ( largeSize * 100.0 ) / totalVolume )>,
+		<vLarges, vLargeSize, ( ( vLargeSize * 100.0 ) / totalVolume )>
+	>;
 }

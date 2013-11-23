@@ -10,17 +10,25 @@ import debug::Profiler;
 import Analyze::Model;
 import Analyze::Volume;
 
+private map[loc, int] complexities = ();
+
 /* Retrieves the complexity for the given unit. */
-public int getMethodComplexity( loc unit ) = computeComplexity( unit );
+public int getMethodComplexity( loc unit ) {
+	if ( unit in complexities ) {
+		return complexities[ unit ];
+	}
+	
+	int complexity = computeComplexity( unit );
+	complexities[ unit ] = complexity;
+	return complexity;
+}
 
 /* Computes the cyclomatic complexity of given method location. */
 private int computeComplexity( loc unit ) {
 	if ( !isMethod( unit ) ) {
 		throw IllegalArgument( "Given unit location must be a method: <unit>" );
 	}
-	
-	log( "Start complexity of <unit>..." );
-	
+
 	Declaration method = getMethodASTEclipse( unit );
 	int count = 1;
 
@@ -40,7 +48,6 @@ private int computeComplexity( loc unit ) {
 		case \case(Expression _): count += 1;
 	};
 
-	log( "<unit> has complexity of <count>" );
 	return count;
 }
 

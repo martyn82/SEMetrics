@@ -21,7 +21,7 @@ anno tuple[
 /* Duplication */
 anno tuple[int absoluteLOC, real relativeLOC, int cloneCount, int minimumCloneSize] Metrics@duplication;
 /* Size */
-anno tuple[int linesOfCode, int lines, real manDays, real manMonths, real manYears] Metrics@size;
+anno tuple[int linesOfCode, int lines, real manDays, real manMonths, real manYears] Metrics@effort;
 /* Clones */
 anno rel[loc method, int cloneStart, int size] Metrics@clones;
 /* Files */
@@ -47,7 +47,7 @@ anno rel[loc method, int size, real manDays, int complexity] Metrics@methods;
 
 @memo public tuple[int absoluteLOC, real relativeLOC, int cloneCount, int minimumCloneSize] duplication( Metrics m ) =
 	m@duplication;
-@memo public tuple[int linesOfCode, int lines, real manDays, real manMonths, real manYears] size( Metrics m ) = m@size;
+@memo public tuple[int linesOfCode, int lines, real manDays, real manMonths, real manYears] effort( Metrics m ) = m@size;
 @memo public rel[loc method, int cloneStart, int size] clones( Metrics m ) = m@clones;
 @memo public rel[loc file, int size] files( Metrics m ) = m@files;
 @memo public rel[loc class, int size, real manDays] classes( Metrics m ) = m@classes;

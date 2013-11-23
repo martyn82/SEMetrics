@@ -115,10 +115,18 @@ private bool isComment( str line ) {
 /* Returns the minimum clone size. */
 public int getMinimumCloneSize() = 6;
 
+private bool hasDupes = false;
+private tuple[map[tuple[loc method, int cloneStart] location, int cloneSize] clone, int linesCloned] dupes;
+
 /* Retrieves duplications as tuple with a map from file to starting lines, and total count duplicated lines. */
 public tuple[map[tuple[loc method, int cloneStart] location, int cloneSize] clone, int linesCloned] getDuplications(
 	M3 model
 ) {
+	if ( hasDupes ) {
+		log( "Got duplications from cache." );
+		return dupes;
+	}
+	
 	log( "Start clone detection..." );
 	int blockSize = getMinimumCloneSize();
 
@@ -162,7 +170,9 @@ public tuple[map[tuple[loc method, int cloneStart] location, int cloneSize] clon
 	
 	log( "Clone detection done." );
 	
-	return <duplicatedBlocks, duplicatedLines>;
+	dupes = <duplicatedBlocks, duplicatedLines>;
+	hasDupes = true;
+	return dupes;
 }
 
 /* Retrieves the blocks per file. */

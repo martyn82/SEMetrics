@@ -6,35 +6,57 @@ import util::Math;
 
 import lang::java::m3::Core;
 
+import debug::Profiler;
+
+import Quality;
+
 import Analyze::Code;
 import Analyze::Complexity;
 import Analyze::Model;
 import Analyze::Volume;
 
-import Quality;
-
 import Data::Metrics;
 
 /* Predefined projects */
 public loc sample = |project://Sample|;
-public loc smallsql = |project://smallsql/src/smallsql/database|;
-public loc hsqldb = |project://hsqldb-2.3.1/hsqldb/src|;
+public loc smallsql = |project://smallsql|;
+public loc hsqldb = |project://hsqldb-2.3.1|;
 
 /* Analyzes the given project location. */
 public Metrics getMetrics( loc project ) {
+	log( "Composing metrics for <project>..." );
+	
+	log( "Create model..." );
 	M3 model = getModel( project );
 	
+	log( "Construct metrics..." );
 	Metrics m = metrics( project );
 	
-	m@complexity  = getComplexityPartitions( model );
-	m@volume      = analyzeVolume( model );
-	m@clones      = analyzeClones( model );
-	m@files       = analyzeFiles( model );
-	m@classes     = analyzeClasses( model );
-	m@methods     = analyzeMethods( model );
+	log( "Get complexity partitions..." );
+	m@complexity = getComplexityPartitions( model );
+	
+	log( "Analyze volume..." );
+	m@volume = getVolumePartitions( model );
+	
+	log( "Analyze clones..." );
+	m@clones = analyzeClones( model );
+	
+	log( "Analyze files..." );
+	m@files = analyzeFiles( model );
+	
+	log( "Analyze classes..." );
+	m@classes = analyzeClasses( model );
+	
+	log( "Analyze methods..." );
+	m@methods = analyzeMethods( model );
+	
+	log( "Analyze duplications..." );
 	m@duplication = analyzeDuplication( model );
-	m@size        = analyzeSize( model );
+	
+	log( "Analyze effort..." );
+	m@effort = analyzeEffort( model );
 
+	log( "Done." );
 	return m;
 }
 
@@ -47,7 +69,7 @@ public void analyze( Metrics m ) {
 }
 
 /* Analyzes size. */
-private tuple[int linesOfCode, int lines, real manDays, real manMonths, real manYears] analyzeSize( M3 model ) {
+private tuple[int linesOfCode, int lines, real manDays, real manMonths, real manYears] analyzeEffort( M3 model ) {
 	files = getFiles( model );
 	return <getLinesOfCode( files ), getLineCount( files ), getManDays( files ), getManMonths( files ), getManYears( files )>;
 }
@@ -62,36 +84,7 @@ private tuple[int absoluteLOC, real relativeLOC, int cloneCount, int minimumClon
 		getMinimumCloneSize()
 	>;
 }
-/* Analyzes complexity. */
-private tuple[
-	tuple[rel[loc method, int complexity] methods, int absoluteLOC, real relativeLOC] low,
-	tuple[rel[loc method, int complexity] methods, int absoluteLOC, real relativeLOC] moderate,
-	tuple[rel[loc method, int complexity] methods, int absoluteLOC, real relativeLOC] high,
-	tuple[rel[loc method, int complexity] methods, int absoluteLOC, real relativeLOC] veryHigh
-] analyzeComplexity( M3 model ) {
-	partitions = getComplexityPartitions( model );
-	return <
-		<partitions[1].c, partitions[1].absLOC, partitions[1].relLOC>,
-		<partitions[2].c, partitions[2].absLOC, partitions[2].relLOC>,
-		<partitions[3].c, partitions[3].absLOC, partitions[3].relLOC>,
-		<partitions[4].c, partitions[4].absLOC, partitions[4].relLOC>
-	>;
-}
-/* Analyzes the volume of the model to construct partitions. */
-private tuple[
-	tuple[rel[loc method, int size] methods, int absoluteLOC, real relativeLOC] small,
-	tuple[rel[loc method, int size] methods, int absoluteLOC, real relativeLOC] medium,
-	tuple[rel[loc method, int size] methods, int absoluteLOC, real relativeLOC] large,
-	tuple[rel[loc method, int size] methods, int absoluteLOC, real relativeLOC] xlarge
-] analyzeVolume( M3 model ) {
-	partitions = getVolumePartitions( model );
-	return <
-		<partitions[1].s, partitions[1].absLOC, partitions[1].relLOC>,
-		<partitions[2].s, partitions[2].absLOC, partitions[2].relLOC>,
-		<partitions[3].s, partitions[3].absLOC, partitions[3].relLOC>,
-		<partitions[4].s, partitions[4].absLOC, partitions[4].relLOC>
-	>;
-}
+
 /* Analyzes the clones from the model. */
 private rel[loc method, int cloneStart, int size] analyzeClones( M3 model ) {
 	rel[loc method, int cloneStart, int size] result = {};
@@ -101,11 +94,14 @@ private rel[loc method, int cloneStart, int size] analyzeClones( M3 model ) {
 	}
 	return result;
 }
+
 /* Analyzes files from the model. */
 private rel[loc file, int size] analyzeFiles( M3 model ) = {<file, getLinesOfCode( file )> | file <- getFiles( model )};
+
 /* Analyzes classes from the model. */
 private rel[loc class, int size, real manDays] analyzeClasses( M3 model ) =
 	{<class, getLinesOfCode( class ), getManDays( class ) > | class <- getClasses( model )};
+
 /* Analyzes methods from the model. */
 private rel[loc method, int size, real manDays, int complexity] analyzeMethods( M3 model ) =
 	{< method, getLinesOfCode( method ), getManDays( method ), getMethodComplexity( method )>
