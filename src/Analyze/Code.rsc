@@ -114,7 +114,9 @@ private bool isComment( str line ) {
 public int getMinimumCloneSize() = 6;
 
 /* Retrieves duplications as tuple with a map from file to starting lines, and total count duplicated lines. */
-public tuple[map[tuple[loc, int], int], int] getDuplications( M3 model ) {
+public tuple[map[tuple[loc method, int cloneStart] location, int cloneSize] clone, int linesCloned] getDuplications(
+	M3 model
+) {
 	int blockSize = getMinimumCloneSize();
 
 	set[loc] files = getFiles( model );

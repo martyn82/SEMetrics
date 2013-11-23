@@ -51,7 +51,7 @@ public int getComplexityRank( M3 model ) {
 		return plus2;
 	}
 	
-	if ( midLOC <= 30 && highLOC < 6 && vHighLOC == 0 ) {
+	if ( midLOC <= 30 && highLOC <= 5 && vHighLOC == 0 ) {
 		complexityRank = plus;
 		return plus;
 	}
