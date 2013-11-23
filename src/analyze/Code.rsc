@@ -38,8 +38,18 @@ public lrel[int, str] getSourceLinesNumbered( loc unit ) {
 public lrel[int, str] getNormalizedSourceLinesNumbered( loc unit ) =
 	normalizeNumberedSource( getSourceLinesNumbered( unit ) );
 
+private map[loc, list[str]] linesCache = ();
+
 /* Retrieves a list of lines from the given unit. */
-private list[str] getLinesFromLocation( loc unit ) = readFileLines( unit );
+private list[str] getLinesFromLocation( loc unit ) {
+	if ( unit in linesCache ) {
+		return linesCache[ unit ];
+	}
+	
+	list[str] lines = readFileLines( unit );
+	linesCache[ unit ] = lines;
+	return lines;
+}
 
 /* Retrieves a list of normalized numbered lines of source code. */
 private lrel[int, str] normalizeNumberedSource( list[tuple[int, str]] source ) =

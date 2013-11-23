@@ -15,6 +15,7 @@ private map[loc, int] complexities = ();
 /* Retrieves the complexity for the given unit. */
 public int getMethodComplexity( loc unit ) {
 	if ( unit in complexities ) {
+		log( "Got complexities from cache." );
 		return complexities[ unit ];
 	}
 	
