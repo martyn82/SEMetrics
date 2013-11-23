@@ -9,7 +9,7 @@ public M3 getModel( loc project ) = createM3FromEclipseProject( project );
 public set[loc] getFiles( M3 model ) = files( model );
 
 /* Retrieves a set of class locations from the given model. */
-public set[loc] getClasses( M3 model ) = classes( model );
+public set[loc] getClasses( M3 model ) = classes( model ) + interfaces( model );
 
 /* Retrieves a set of method and constructor locations from the model. */
 public set[loc] getMethods( M3 model ) = methods( model );

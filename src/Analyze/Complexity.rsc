@@ -28,14 +28,14 @@ private int computeComplexity( loc unit ) {
 		case \if(Expression _, Statement _): count += 1;
 		case \if(Expression _, Statement _, Statement _): count += 1;
 		case \conditional(Expression _, Expression _, Expression _): count += 1;
-		
+
 		case \catch(Declaration _, Statement _): count += 1;
-		
+
 		case \for(list[Expression] _, Expression _, list[Expression] _, Statement _): count += 1;
 		case \for(list[Expression] _, list[Expression] _, Statement _): count += 1;
 		case \foreach(Declaration _, Expression _, Statement _): count += 1;
 		case \while(Expression _, Statement _): count += 1;
-		
+
 		case \switch(Expression _, list[Statement] _): count += 1;
 		case \case(Expression _): count += 1;
 	};
@@ -51,10 +51,13 @@ private int computeComplexity( loc unit ) {
 	2: The absolute number of LOC,
 	3: The relative number of LOC
 */
-public map[int category, tuple[rel[loc unit, int complexity] c, int absLOC, real relLOC] t] getComplexityPartitions(
-	M3 model
-) {
-	rel[loc location, int complexity] complexities = {<method, getMethodComplexity( method )>
+public tuple[
+	tuple[rel[loc method, int complexity] methods, int absoluteLOC, real relativeLOC] low,
+	tuple[rel[loc method, int complexity] methods, int absoluteLOC, real relativeLOC] moderate,
+	tuple[rel[loc method, int complexity] methods, int absoluteLOC, real relativeLOC] high,
+	tuple[rel[loc method, int complexity] methods, int absoluteLOC, real relativeLOC] veryHigh
+] getComplexityPartitions( M3 model ) {
+	rel[loc method, int complexity] complexities = {<method, getMethodComplexity( method )>
 		| method <- getMethods( model )};
 	
 	int lowSize = 0;
@@ -69,32 +72,32 @@ public map[int category, tuple[rel[loc unit, int complexity] c, int absLOC, real
 
 	for ( comp <- complexities ) {
 		if ( comp.complexity < 11 ) {
-			lowSize += getLinesOfCode( comp.location );
+			lowSize += getLinesOfCode( comp.method );
 			lows += {comp};
 		}
 		
 		if ( comp.complexity > 10 && comp.complexity < 21 ) {
-			midSize += getLinesOfCode( comp.location );
+			midSize += getLinesOfCode( comp.method );
 			mids += {comp};
 		}
 		
 		if ( comp.complexity > 20 && comp.complexity < 51 ) {
-			highSize += getLinesOfCode( comp.location );
+			highSize += getLinesOfCode( comp.method );
 			highs += {comp};
 		}
 
 		if ( comp.complexity > 50 ) {
-			vHighSize += getLinesOfCode( comp.location );
+			vHighSize += getLinesOfCode( comp.method );
 			vhighs += {comp};
 		}
 	}
 	
 	int totalSize = ( lowSize + midSize + highSize + vHighSize ); // Should this be total measured lines or total LOC?
 	
-	return (
-		1 : <lows, lowSize, ( ( lowSize * 100.0 ) / totalSize )>,
-		2 : <mids, midSize, ( ( midSize * 100.0 ) / totalSize )>,
-		3 : <highs, highSize, ( ( highSize * 100.0 ) / totalSize )>,
-		4 : <vhighs, vHighSize, ( ( vHighSize * 100.0 ) / totalSize )>
-	);
+	return <
+		<lows, lowSize, ( ( lowSize * 100.0 ) / totalSize )>,
+		<mids, midSize, ( ( midSize * 100.0 ) / totalSize )>,
+		<highs, highSize, ( ( highSize * 100.0 ) / totalSize )>,
+		<vhighs, vHighSize, ( ( vHighSize * 100.0 ) / totalSize )>
+	>;
 }

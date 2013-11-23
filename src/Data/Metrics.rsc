@@ -28,8 +28,6 @@ anno rel[loc method, int cloneStart, int size] Metrics@clones;
 anno rel[loc file, int size] Metrics@files;
 /* Classes */
 anno rel[loc class, int size, real manDays] Metrics@classes;
-/* Interfaces */
-anno rel[loc interface, int size, real manDays] Metrics@interfaces;
 /* Methods */
 anno rel[loc method, int size, real manDays, int complexity] Metrics@methods;
 
@@ -53,5 +51,4 @@ anno rel[loc method, int size, real manDays, int complexity] Metrics@methods;
 @memo public rel[loc method, int cloneStart, int size] clones( Metrics m ) = m@clones;
 @memo public rel[loc file, int size] files( Metrics m ) = m@files;
 @memo public rel[loc class, int size, real manDays] classes( Metrics m ) = m@classes;
-@memo public rel[loc interface, int size, real manDays] interfaces( Metrics m ) = m@interfaces;
 @memo public rel[loc method, int size, real manDays, int complexity] methods( Metrics m ) = m@methods;

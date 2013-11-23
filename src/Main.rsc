@@ -26,7 +26,7 @@ public Metrics getMetrics( loc project ) {
 	
 	Metrics m = metrics( project );
 	
-	m@complexity  = analyzeComplexity( model );
+	m@complexity  = getComplexityPartitions( model );
 	m@volume      = analyzeVolume( model );
 	m@clones      = analyzeClones( model );
 	m@files       = analyzeFiles( model );
