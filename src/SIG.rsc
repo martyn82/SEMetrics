@@ -14,29 +14,33 @@ import Quality;
 import IO;
 import DateTime;
 
-public void calculateMI(loc project)
+public loc sample = |project://Sample|;
+public loc smallsql = |project://smallsql|;
+public loc hsqldb = |project://hsqldb-2.3.1|;
+
+public void calculateMI( loc project )
 {
-	println("\<<now().hour>:<now().minute>:<now().second>\> Working on model...");
+	println("<now()> Working on model...");
 	model = createM3FromEclipseProject(project);
 	
 	// Volume
-	println("\<<now().hour>:<now().minute>:<now().second>\> Working on Volume...");
+	println("<now()> Working on Volume...");
 	fileAndSourceLines = getSourceLinesOfProject(model);
 	
 	// Complexity
-	println("\<<now().hour>:<now().minute>:<now().second>\> Working on Complexity...");
+	println("<now()> Working on Complexity...");
 	unitComplexity = calculateUnitComplexity(model);
 	
 	// Duplication
-	println("\<<now().hour>:<now().minute>:<now().second>\> Working on Duplication...");
+	println("<now()> Working on Duplication...");
 	duplicateSourceLineCount = getDuplicateSourceLinesOfProject(fileAndSourceLines);
 	
 	// Unit size
-	println("\<<now().hour>:<now().minute>:<now().second>\> Working on Unit size...");
+	println("<now()> Working on Unit size...");
 	unitSize = calculateUnitSize(model, fileAndSourceLines);
 	
 	//  Create MI.
-	println("\<<now().hour>:<now().minute>:<now().second>\> Working on MI matrix...");
+	println("<now()> Working on MI matrix...");
 	
 	sourceLineCount = countSourceLinesOfProject(fileAndSourceLines);
 	int volumeRank = getVolumeRank(sourceLineCount);
