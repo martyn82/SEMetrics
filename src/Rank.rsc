@@ -97,12 +97,6 @@ public int getUnitSizeRank(tuple[real low, real moderate, real high, real veryHi
     return minus2;
 }
 
-public int getUnitTestRank() {
-	// Not implemented, thus ranked neutral.
-	// TODO Dit moet denk ik weg. Beïnvloedt de score misschien te veel?
-    return neutral;
-}
-
 public str rankToString(int rank) {
 	switch (rank) {
 		case plus2:   return "++";

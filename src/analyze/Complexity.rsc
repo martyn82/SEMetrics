@@ -6,8 +6,11 @@ import lang::java::m3::AST;
 import Set;
 import Map;
 
-public tuple[real low, real moderate, real high, real veryHigh] countRelativeComplexity(M3 model, map[tuple[loc,loc],int] complexity, map[tuple[loc,loc],int] size)
-{
+public tuple[real low, real moderate, real high, real veryHigh] countRelativeComplexity(
+	M3 model,
+	map[tuple[loc,loc],int] complexity,
+	map[tuple[loc,loc],int] size
+) {
 	// For a java project a unit is a method.
 	units = { m | m <- model@declarations, isMethod(m.name) };
 	
@@ -20,7 +23,7 @@ public tuple[real low, real moderate, real high, real veryHigh] countRelativeCom
 	return <low * 100.0 / totalSize, moderate * 100.0 / totalSize, high * 100.0 / totalSize, veryHigh * 100.0 / totalSize>;
 }
 
-public map[tuple[loc,loc] unit, int complexity] calculateUnitComplexity(M3 model)
+public map[tuple[loc name,loc src] unit, int complexity] calculateUnitComplexity(M3 model)
 {
     // For a java project a unit is a method. Initializers appear to be not supported by Rascal M3 yet.
     units = { <m, getMethodASTEclipse(m.name)> | m <- model@declarations, isMethod(m.name) };

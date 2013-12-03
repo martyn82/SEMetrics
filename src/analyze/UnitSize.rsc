@@ -21,7 +21,7 @@ public tuple[real low, real moderate, real high, real veryHigh] countRelativeSiz
 	return <low * 100.0 / totalSize, moderate * 100.0 / totalSize, high * 100.0 / totalSize, veryHigh * 100.0 / totalSize>;
 }
 
-public map[tuple[loc,loc] unit, int size] calculateUnitSize(M3 model, map[loc, lrel[int,str]] fileAndSourceLines)
+public map[tuple[loc name,loc src] unit, int size] calculateUnitSize(M3 model, map[loc, lrel[int,str]] fileAndSourceLines)
 {
 	// For a java project a unit is a method.
 	units = { m | m <- model@declarations, isMethod(m.name) };
