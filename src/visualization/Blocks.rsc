@@ -13,6 +13,8 @@ import analyze::Complexity;
 import analyze::UnitSize;
 import analyze::Volume;
 
+import util::Editors;
+
 import IO;
 
 public void draw( loc project ) {
@@ -35,7 +37,7 @@ public void draw( M3 model, str title ) {
 		loc methodName = method;
 		
 		append box(
-			area( 19 + methodSize ),
+			size( 20, 19 + methodSize ),
 			fillColor( getMethodColor( complexity ) ),
 			lineWidth( 1 ),
 			lineColor( Color () {
@@ -50,7 +52,7 @@ public void draw( M3 model, str title ) {
 			} ),
 			onMouseDown(
 				bool ( int button, map[ KeyModifier, bool] modifiers ) {
-					// Navigate to the location!
+					edit( methodLocation );
 					return false;
 				}
 			)
@@ -74,7 +76,7 @@ public void draw( M3 model, str title ) {
 	);
 	
 	render(
-		vcat( [header] + treemap( figures ) + [infobox] )
+		vcat( [header] + pack( figures ) + [infobox] )
 	);
 }
 
@@ -102,12 +104,4 @@ private Color to = color( "red" );
 
 private Color getMethodColor( int complexity ) {
 	return interpolateColor( from, to, ( complexity * 100 / 5000.0 ) );
-}
-
-public void drawPropertyWindow() {
-	println( "Enter" );
-}
-
-public void disposePropertyWindow() {
-	println( "Exit" );
 }
