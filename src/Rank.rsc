@@ -56,6 +56,14 @@ public int getComplexityRank(tuple[real low, real moderate, real high, real very
     return minus2;
 }
 
+public int getComplexityRank(int cc)
+{
+	if (cc > 50) { return minus2; }	
+	if (cc > 20) { return minus; }
+	if (cc > 10) { return neutral; }
+	return plus;
+}
+
 public int getDuplicationRank(real rd) {
 	if (rd >= 20) {
 		return minus2;

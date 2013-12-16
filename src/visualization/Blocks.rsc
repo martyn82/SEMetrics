@@ -11,23 +11,11 @@ import vis::Figure;
 import vis::Render;
 import vis::KeySym;
 
-import analyze::Complexity;
-import analyze::UnitSize;
-import analyze::Volume;
-
 import util::Editors;
 
 import IO;
 
-public void draw( loc project ) {
-	model = createM3FromEclipseProject( project );
-	draw( model, "Project analysis" );
-}
-
-public void draw( M3 model, str title ) {
-	complexities = loadComplexities( model );
-	sizes = loadMethodSizes( model );
-	
+public void drawBlocks( M3 model, map[loc, int] complexities, map[loc,int] sizes ) {
 	methodLocs = (m : l | <m,l> <- model@declarations, isMethod( m ));
 	classLocs = (c : l | <c, l> <- model@declarations, isClass( c ));
 	
@@ -91,14 +79,6 @@ public void draw( M3 model, str title ) {
 		);
 	};
 	
-	header = box(
-		text( title, fontSize( 20 ), fontColor( "white" ), left() ),
-		fillColor( rgb( 1, 128, 62 ) ),
-		lineWidth( 0 ),
-		height( 40 ),
-		vresizable( false )
-	);
-	
 	infobox = box(
 		text( str () { return message; }, fontSize( 12 ), fontColor( "white" ), left() ),
 		fillColor( rgb( 1, 38, 19 ) ),
@@ -108,27 +88,9 @@ public void draw( M3 model, str title ) {
 	);
 	
 	render(
+		"TreeMap",
 		vcat( [treemap( figures ), infobox] )
 	);
-}
-
-private map[loc, int] loadComplexities( M3 model ) {
-	unitComplexities = calculateUnitComplexity( model );
-	complexities = ();
-	for ( unit <- unitComplexities ) {
-		complexities[ unit.name ] = unitComplexities[ unit ];
-	}
-	return complexities;
-}
-
-private map[loc, int] loadMethodSizes( M3 model ) {
-	fileSourceLines = getSourceLinesOfProject( model );
-	unitSizes = calculateUnitSize( model, fileSourceLines );
-	sizes = ();
-	for ( unit <- unitSizes ) {
-		sizes[ unit.name ] = unitSizes[ unit ];
-	}
-	return sizes;
 }
 
 private Color from = color( "yellow" );

@@ -23,6 +23,17 @@ public tuple[real low, real moderate, real high, real veryHigh] countRelativeCom
 	return <low * 100.0 / totalSize, moderate * 100.0 / totalSize, high * 100.0 / totalSize, veryHigh * 100.0 / totalSize>;
 }
 
+public tuple[real low, real moderate, real high, real veryHigh] countRelativeComplexity(rel[loc method, int cc, int s] ms)
+{
+	low      = (0 | it + u.s | u <- ms, u.cc <= 10);
+	moderate = (0 | it + u.s | u <- ms, 11 <= u.cc && u.cc <= 20);
+	high     = (0 | it + u.s | u <- ms, 21 <= u.cc && u.cc <= 50);
+	veryHigh = (0 | it + u.s | u <- ms, 51 <= u.cc);
+	
+	totalSize = low + moderate + high + veryHigh;
+	return <low * 100.0 / totalSize, moderate * 100.0 / totalSize, high * 100.0 / totalSize, veryHigh * 100.0 / totalSize>;
+}
+
 public map[tuple[loc name,loc src] unit, int complexity] calculateUnitComplexity(M3 model)
 {
     // For a java project a unit is a method. Initializers appear to be not supported by Rascal M3 yet.
