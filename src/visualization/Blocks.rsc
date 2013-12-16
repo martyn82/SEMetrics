@@ -112,39 +112,25 @@ public void draw( M3 model, str title ) {
 	);
 }
 
-private map[loc, int] complexities = ();
 private map[loc, int] loadComplexities( M3 model ) {
-	if ( size( complexities ) > 0 ) {
-		return complexities;
-	}
-	
-	result = ();
 	unitComplexities = calculateUnitComplexity( model );
-	for ( item <- unitComplexities ) {
-		result[ item.name ] = unitComplexities[ item ];
+	complexities = ();
+	for ( unit <- unitComplexities ) {
+		complexities[ unit.name ] = unitComplexities[ unit ];
 	}
-	complexities = result;
-	return result;
+	return complexities;
 }
 
-private map[loc, int] methodSizes = ();
 private map[loc, int] loadMethodSizes( M3 model ) {
-	if ( size( methodSizes ) > 0 ) {
-		return methodSizes;
-	}
+	fileSourceLines = getSourceLinesOfProject( model );
+	unitSizes = calculateUnitSize( model, fileSourceLines );
 	sizes = ();
-	fileAndSourceLines = getSourceLinesOfProject(model);
-	unitSizes = calculateUnitSize( model, fileAndSourceLines );
-	for ( item <- unitSizes ) {
-		sizes[ item.name ] = unitSizes[ item ];
+	for ( unit <- unitSizes ) {
+		sizes[ unit.name ] = unitSizes[ unit ];
 	}
-	methodSizes = sizes;
 	return sizes;
 }
 
 private Color from = color( "yellow" );
 private Color to = color( "red" );
-
-private Color getMethodColor( int complexity ) {
-	return interpolateColor( from, to, ( complexity * 100 / 5000.0 ) );
-}
+private Color getMethodColor( int complexity ) = interpolateColor( from, to, ( complexity * 100 / 5000.0 ) );
