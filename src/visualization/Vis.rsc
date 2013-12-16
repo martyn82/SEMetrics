@@ -15,10 +15,14 @@ import visualization::Blocks;
 public str containers = "containers";
 public str treemap = "treemap";
 
+private M3 modelObj;
+private map[loc,int] complexityObj;
+private map[loc,int] sizeObj;
+
 public void visualize( loc project ) {
-	model = createM3FromEclipseProject( project );
-	complexities = loadComplexities( model );
-	sizes = loadMethodSizes( model );
+	modelObj = createM3FromEclipseProject( project );
+	complexityObj = loadComplexities( modelObj );
+	sizeObj = loadMethodSizes( modelObj );
 
 	render(
 		"Choose...",
@@ -26,13 +30,13 @@ public void visualize( loc project ) {
 			button(
 				"Show complexities as containers",
 				void() {
-					drawContainers( model, complexities, sizes );
+					drawContainers( modelObj, complexityObj, sizeObj );
 				}
 			),
 			button(
 				"Show complexities as treemap",
 				void() {
-					drawBlocks( model, complexities, sizes );
+					drawBlocks( modelObj, complexityObj, sizeObj );
 				}
 			)
 		] )
